@@ -127,11 +127,28 @@ Node *Insert(Node *root, Node *N){
     return root;
 }
 
-void rotateLeft(Node *root, Node *N){
+void rotateLeft(Node *root, Node *n){
+    Node *y = n->right;
+    n->right = y->left;
+    if (y->left != NULL){
+        y->left->parent = n;
+    }
+    y->parent = n->parent;
+    if (n->parent == NULL){ //n is the root
+        root = y;
+    }
+    else if (n == n->parent->left){ // n is the left child
+        n->parent->left = y;
+    }
+    else{
+        n->parent->right = y;
+    }
+    y->left = n;
+    n->parent = y;
 
 }
-
-void rotateRight(Node *root, Node *N){
+// same but every right is now left and vice versa
+void rotateRight(Node *root, Node *n){
 
 }
 
@@ -139,8 +156,10 @@ void rotateRight(Node *root, Node *N){
 void insertFix(Node *root, Node *n){
     Node *u; //uncle node
     while (n->parent->colour == true){
-        if (n->parent == n->parent->parent->right)
+        if (n->parent == n->parent->parent->right){
+
             u = n->parent->parent->left; 
+
             if (u->colour == true){
                 u->colour = false;
                 n->parent->colour = false;
@@ -156,6 +175,7 @@ void insertFix(Node *root, Node *n){
                 n->parent->parent->colour = true;
                 rotateRight(root, n->parent->parent);            
                 }
+        }
         else{
             u = n->parent->parent->right;
 
@@ -183,5 +203,9 @@ void insertFix(Node *root, Node *n){
 }
 
 int main() {
+    Node *n, *root;
 
+    
+
+    insertFix(root, n);
 }
