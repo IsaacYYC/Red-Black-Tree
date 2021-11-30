@@ -47,6 +47,7 @@ class RedBlackTree{
 
         // step 1.
         Node BSTInsert(Node *root, int data);
+        Node Insert(Node *root, int data);
 
         // how to fix the properties
         // there are several cases we need to consider
@@ -202,10 +203,29 @@ void insertFix(Node *root, Node *n){
         root->colour = false; 
 }
 
+  void printHelper(Node *root, std::string indent, bool last) {
+    if (root != NULL) {
+      std::cout << indent;
+      if (last) {
+        std::cout << "R----";
+        indent += "   ";
+      } else {
+        std::cout << "L----";
+        indent += "|  ";
+      }
+
+      std::string sColor = root->colour ? "RED" : "BLACK";
+      std::cout << root->data << "(" << sColor << ")" << std::endl;
+      printHelper(root->left, indent, false);
+      printHelper(root->right, indent, true);
+    }
+  }
+
+
+
+
+
 int main() {
-    Node *n, *root;
 
-    
 
-    insertFix(root, n);
 }
