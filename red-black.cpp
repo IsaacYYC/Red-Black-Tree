@@ -9,7 +9,6 @@
 // 4. Every simple path from a node to a descendant leaf contains the same number of black nodes. 
 // 5. Every leaf (NULL) is black. 
 
-        parent = left = right = NULL;
 struct Node {
   int data;
   Node *parent;
