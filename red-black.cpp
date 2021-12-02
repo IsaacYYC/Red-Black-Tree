@@ -22,6 +22,7 @@ typedef Node *Node_;
 class RedBlackTree{
     private:
         Node_ root;
+        void printHelper(Node_ root, std::string indent, bool last);
 
     public:
         RedBlackTree() {root = NULL;}
@@ -31,13 +32,16 @@ class RedBlackTree{
         // 3. fix the red-black properties
 
         // step 1.
-        void insertFix(Node_ n);
         void rotateLeft(Node_ n);
         void rotateRight(Node_ n);
+        void insertFix(Node_ n);
         void Insert(int input);
+        void printTree();
 };
 // modified to RBTree insert. 
 // need to make the new node red, not done yet
+
+
 void RedBlackTree::rotateLeft(Node_ n){
     Node_ y = n->right;
     n->right = y->left;
@@ -57,6 +61,26 @@ void RedBlackTree::rotateLeft(Node_ n){
     y->left = n;
     n->parent = y;
 
+}
+
+void RedBlackTree::rotateRight(Node_ n){
+    Node_ y = n->left;
+    n->left = y->right;
+    if (y->right != NULL) {
+      y->right->parent = n;
+    }
+    y->parent = n->parent;
+    if (n->parent == NULL) {
+      root = y;
+    } 
+    else if (n == n->parent->right) {
+      n->parent->right = y;
+    } 
+    else {
+      n->parent->left = y;
+    }
+    y->right = n;
+    n->parent = y;
 }
 
 void RedBlackTree::insertFix(Node_ n){
@@ -107,6 +131,7 @@ void RedBlackTree::insertFix(Node_ n){
     }
         root->colour = false; 
 }
+
 void RedBlackTree::Insert(int input){
     Node_ N = new Node;
     N->data = input;
@@ -140,17 +165,47 @@ void RedBlackTree::Insert(int input){
         }
         insertFix(N);
 
+    }
+
+
 }
 
 
-// same but every right is now left and vice versa
 
+  void RedBlackTree::printHelper(Node_ root, std::string indent, bool last) {
 
+    if (root != NULL) {
+      std::cout << indent;
+      if (last) {
+        std::cout << "R----";
+        indent += "   ";
+      } else {
+        std::cout << "L----";
+        indent += "|  ";
+      }
 
+      bool sColor = root->colour ? true : false;
+      std::cout << root->data << "(" << sColor << ")" << std::endl;
+      printHelper(root->left, indent, false);
+      printHelper(root->right, indent, true);
+    }
+  }
 
-
+  void RedBlackTree::printTree() {
+    if (root) {
+      printHelper(this->root, "", true);
+    }
+  }
 
 int main() {
+  RedBlackTree bst;
+  bst.Insert(55);
+// once it inserts more than once, the print function breaks and no longer prints 
+  bst.printTree();
 
-    return 0;
+
 }
+
+
+
+
