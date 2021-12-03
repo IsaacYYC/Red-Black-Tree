@@ -15,6 +15,14 @@ struct Node {
   Node *left;
   Node *right;
   bool colour;
+
+    Node(){
+      int data = 0;
+      Node *left = nullptr;
+      Node *right = nullptr;
+      Node *parent = nullptr;
+      bool colour = false;
+    }
 };
 
 typedef Node *Node_;
@@ -22,7 +30,10 @@ typedef Node *Node_;
 class RedBlackTree{
     private:
         Node_ root;
-        void printHelper(Node_ root, std::string indent, bool last);
+        void printHelper(Node_, std::string, bool);
+        void insertFix(Node_);
+        void deleteFix(Node_);
+        void Delete(Node_, int);
 
     public:
         RedBlackTree() {root = NULL;}
@@ -32,10 +43,13 @@ class RedBlackTree{
         // 3. fix the red-black properties
 
         // step 1.
-        void rotateLeft(Node_ n);
-        void rotateRight(Node_ n);
-        void insertFix(Node_ n);
-        void Insert(int input);
+        void rotateLeft(Node_);
+        void rotateRight(Node_);
+        void Insert(int);
+        Node_ minimum(Node_);
+        void rbTransplant(Node_, Node_);
+
+        void deleteExecute(int);
         void printTree();
 };
 // modified to RBTree insert. 
@@ -84,30 +98,12 @@ void RedBlackTree::rotateRight(Node_ n){
 }
 
 void RedBlackTree::insertFix(Node_ n){
+
     Node_ u; //uncle node
     while (n->parent->colour == true){
-        if (n->parent == n->parent->parent->right){
+        if (n->parent == n->parent->parent->left){
 
-            u = n->parent->parent->left; 
-
-            if (u->colour == true){
-                u->colour = false;
-                n->parent->colour = false;
-                n->parent->parent->colour = true;
-                n = n->parent->parent;
-            }
-            else{
-                if (n == n->parent->left){
-                    n = n->parent;
-                    rotateLeft(n);
-                }
-                n->parent->colour = false;
-                n->parent->parent->colour = true;
-                rotateRight(n->parent->parent);            
-                }
-        }
-        else{
-            u = n->parent->parent->right;
+            u = n->parent->parent->right; 
 
             if (u->colour == true){
                 u->colour = false;
@@ -122,7 +118,26 @@ void RedBlackTree::insertFix(Node_ n){
                 }
                 n->parent->colour = false;
                 n->parent->parent->colour = true;
-                rotateRight(n->parent->parent);        
+                rotateRight(n->parent->parent);            
+                }
+        }
+        else{
+            u = n->parent->parent->left;
+
+            if (u->colour == true){
+                u->colour = false;
+                n->parent->colour = false;
+                n->parent->parent->colour = true;
+                n = n->parent->parent;
+            }
+            else{
+                if (n == n->parent->left){
+                    n = n->parent;
+                    rotateRight(n);
+                }
+                n->parent->colour = false;
+                n->parent->parent->colour = true;
+                rotateLeft(n->parent->parent);        
                 }
             }
         if (n == root) {
@@ -133,44 +148,177 @@ void RedBlackTree::insertFix(Node_ n){
 }
 
 void RedBlackTree::Insert(int input){
+
     Node_ N = new Node;
     N->data = input;
     N->colour = true;
 
+    Node_ z = NULL;
     Node_ r = root;
-    Node_ y = NULL;
 
+    while (r != NULL) {
+      z = r;
+      if (N->data > r->data) {
+        r = r->right;
+      } else {
+        r = r->left;
+      }
+    }
+    N->parent = z;
+
+    if (z == NULL) {
+      root = N;
+    } else if (N->data > z->data) {
+      z->right = N;
+    } else {
+      z->left = N;
+    }
+
+    if (N->parent == NULL) {
+      N->colour = false;
+      return;
+    }
+
+
+    if (N->parent->parent == NULL) {
+      return;
+    }
     
-    if (root == NULL){
-        root = N;
-        N->parent = NULL;
+    insertFix(N);
+  }
+
+  void RedBlackTree::deleteFix(Node_ x) {
+    Node_ s;
+    while (x != root && x->colour == false) {
+      if (x == x->parent->left) {
+        s = x->parent->right;
+        if (s->colour == true) {
+          s->colour = false;
+          x->parent->colour = true;
+          rotateLeft(x->parent);
+          s = x->parent->right;
+        }
+
+        if (s->left->colour == false && s->right->colour == false) {
+          s->colour = true;
+          x = x->parent;
+        } else {
+          if (s->right->colour == false) {
+            s->left->colour = false;
+            s->colour = true;
+            rotateRight(s);
+            s = x->parent->right;
+          }
+
+          s->colour = x->parent->colour;
+          x->parent->colour = false;
+          s->right->colour = false;
+          rotateLeft(x->parent);
+          x = root;
+        }
+      } else {
+        s = x->parent->left;
+        if (s->colour == true) {
+          s->colour = false;
+          x->parent->colour = true;
+          rotateRight(x->parent);
+          s = x->parent->left;
+        }
+
+        if (s->right->colour == false && s->right->colour == false) {
+          s->colour = true;
+          x = x->parent;
+        } else {
+          if (s->left->colour == false) {
+            s->right->colour = false;
+            s->colour = true;
+            rotateLeft(s);
+            s = x->parent->left;
+          }
+
+          s->colour = x->parent->colour;
+          x->parent->colour = false;
+          s->left->colour = false;
+          rotateRight(x->parent);
+          x = root;
+        }
+      }
+    }
+    x->colour = false;
+  }
+
+  Node_ RedBlackTree::minimum(Node_ n) {
+    while (n->left != NULL) {
+      n = n->left;
+    }
+    return n;
+  }
+
+  void RedBlackTree::rbTransplant(Node_ u, Node_ v) {
+    if (u->parent == NULL) {
+      root = v;
+    } else if (u == u->parent->left) {
+      u->parent->left = v;
+    } else {
+      u->parent->right = v;
+    }
+    v->parent = u->parent;
+  }
+
+  void RedBlackTree::Delete(Node_ n, int data){
+    Node_ z = NULL;
+    Node_ x, y;
+    while (n != NULL) {
+      if (n->data == data) {
+        z = n;
+      }
+
+      if (n->data <= data) {
+        n = n->right;
+      } else {
+        n = n->left;
+      }
     }
 
-    else{
-        while(root != NULL){
-            y = r;
-            if (N->data <= r->data){
-                r = r->left;
-            }
-            else{
-                r = r->right;
-            }
-        }
-        N->parent = y;
-        if (y->data < N->data){
-            y->right = N;
-        }
-        else{
-            y->left = N;
-        }
-        insertFix(N);
-
+    if (z == NULL) {
+      std::cout << "Key not found in the tree" << std::endl;
+      return;
     }
 
+    y = z;
+    int y_orig_colour = y->colour;
+    if (z->left == NULL) {
+      x = z->right;
+      rbTransplant(z, z->right);
+    } else if (z->right == NULL) {
+      x = z->left;
+      rbTransplant(z, z->left);
+    } else {
+      y = minimum(z->right);
+      y_orig_colour = y->colour;
+      x = y->right;
+      if (y->parent == z) {
+        x->parent = y;
+      } else {
+        rbTransplant(y, y->right);
+        y->right = z->right;
+        y->right->parent = y;
+      }
 
-}
+      rbTransplant(z, y);
+      y->left = z->left;
+      y->left->parent = y;
+      y->colour = z->colour;
+    }
+    delete z;
+    if (y_orig_colour == false) {
+      deleteFix(x);
+    }
+  }
 
-
+  void RedBlackTree::deleteExecute(int data) {
+    Delete(root, data);
+  }
 
   void RedBlackTree::printHelper(Node_ root, std::string indent, bool last) {
 
@@ -185,13 +333,16 @@ void RedBlackTree::Insert(int input){
       }
 
       bool sColor = root->colour ? true : false;
-      std::cout << root->data << "(" << sColor << ")" << std::endl;
+      std::string sColour = (sColor == true) ? "RED" : "BLACK";
+      std::cout << root->data << "(" << sColour << ")" << std::endl;
       printHelper(root->left, indent, false);
       printHelper(root->right, indent, true);
     }
+
   }
 
   void RedBlackTree::printTree() {
+
     if (root) {
       printHelper(this->root, "", true);
     }
@@ -199,9 +350,16 @@ void RedBlackTree::Insert(int input){
 
 int main() {
   RedBlackTree bst;
-  bst.Insert(55);
-// once it inserts more than once, the print function breaks and no longer prints 
+  bst.Insert(5);
+  bst.Insert(10);
+  bst.Insert(2);
+
+  // it will print 3 as long as the third input is smaller than the first 2 while the first input is smaller than the second ex insert(5), insert(10), insert(2)  
+  // it will print 3 as long as the third input is bigger than the first 2 while the first input is bigger than the second ex insert(7), insert(1), insert(80)
   bst.printTree();
+
+
+
 
 
 }
