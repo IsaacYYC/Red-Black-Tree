@@ -59,69 +59,94 @@ class RedBlackTree{
 void RedBlackTree::rotateLeft(Node_ n){
     Node_ y = n->right;
     n->right = y->left;
-    if (y->left != iRoot){
+
+    if (y->left != iRoot)
+    {
         y->left->parent = n;
     }
     y->parent = n->parent;
-    if (n->parent == NULL){ //n is the root
+
+    if (n->parent == NULL)
+    { //n is the root
         root = y;
     }
-    else if (n == n->parent->left){ // n is the left child
+
+    else if (n == n->parent->left)
+    { // n is the left child
         n->parent->left = y;
     }
-    else{
+
+    else
+    {
         n->parent->right = y;
     }
+
     y->left = n;
     n->parent = y;
-
 }
 
 void RedBlackTree::rotateRight(Node_ n){
     Node_ y = n->left;
     n->left = y->right;
-    if (y->right != iRoot) {
+
+    if (y->right != iRoot) 
+    {
       y->right->parent = n;
     }
     y->parent = n->parent;
-    if (n->parent == NULL) {
+
+    if (n->parent == NULL) 
+    {
       root = y;
     } 
-    else if (n == n->parent->right) {
+
+    else if (n == n->parent->right) 
+    {
       n->parent->right = y;
     } 
-    else {
+
+    else 
+    {
       n->parent->left = y;
     }
+
     y->right = n;
     n->parent = y;
 }
 
-void RedBlackTree::insertFix(Node_ n){
-
+void RedBlackTree::insertFix(Node_ n)
+{
     Node_ u; //uncle node
-    while (n->parent->colour == true){
-        if (n->parent == n->parent->parent->left){
-
+    while (n->parent->colour == true)
+    {
+        if (n->parent == n->parent->parent->left)
+        {
             u = n->parent->parent->right; 
 
-            if (u->colour == true){
+            if (u->colour == true)
+            {
                 u->colour = false;
                 n->parent->colour = false;
                 n->parent->parent->colour = true;
                 n = n->parent->parent;
             }
-            else{
-                if (n == n->parent->right){
+
+            else
+            {
+                if (n == n->parent->right)
+                {
                     n = n->parent;
                     rotateLeft(n);
                 }
+
                 n->parent->colour = false;
                 n->parent->parent->colour = true;
                 rotateRight(n->parent->parent);            
-                }
+            }
         }
-        else{
+
+        else
+        {
             u = n->parent->parent->left;
 
             if (u->colour == true){
@@ -130,24 +155,30 @@ void RedBlackTree::insertFix(Node_ n){
                 n->parent->parent->colour = true;
                 n = n->parent->parent;
             }
-            else{
-                if (n == n->parent->left){
+            else
+            {
+                if (n == n->parent->left)
+                {
                     n = n->parent;
                     rotateRight(n);
                 }
+
                 n->parent->colour = false;
                 n->parent->parent->colour = true;
                 rotateLeft(n->parent->parent);        
-                }
             }
-        if (n == root) {
+        }
+
+        if (n == root) 
+        {
             break;
         }
     }
-        root->colour = false; 
+  root->colour = false; 
 }
 
-void RedBlackTree::Insert(int input){
+void RedBlackTree::Insert(int input)
+{
 
     Node_ N = new Node;
     N->data = input;
@@ -158,21 +189,31 @@ void RedBlackTree::Insert(int input){
     Node_ z = NULL;
     Node_ r = root;
 
-    while (r != iRoot) {
+    while (r != iRoot) 
+    {
       z = r;
-      if (N->data > r->data) {
-        r = r->right;
-      } else {
-        r = r->left;
-      }
+      if (N->data > r->data) 
+        {
+          r = r->right;
+        } 
+      else 
+        {
+          r = r->left;
+        }
     }
+
     N->parent = z;
 
-    if (z == NULL) {
+    if (z == NULL) 
+    {
       root = N;
-    } else if (N->data > z->data) {
+    } 
+    else if (N->data > z->data) 
+    {
       z->right = N;
-    } else {
+    } 
+    else 
+    {
       z->left = N;
     }
 
@@ -181,11 +222,6 @@ void RedBlackTree::Insert(int input){
       return;
     }
 
-
-    if (N->parent->parent == NULL) {
-      return;
-    }
-    
     insertFix(N);
   }
 
