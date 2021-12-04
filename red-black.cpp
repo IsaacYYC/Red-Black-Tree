@@ -23,6 +23,7 @@ struct Node {
       Node *parent = nullptr;
       bool colour = false;
     }
+
 };
 
 typedef Node *Node_;
@@ -30,19 +31,20 @@ typedef Node *Node_;
 class RedBlackTree{
     private:
         Node_ root;
+        Node_ iRoot;
         void printHelper(Node_, std::string, bool);
         void insertFix(Node_);
         void deleteFix(Node_);
         void Delete(Node_, int);
 
     public:
-        RedBlackTree() {root = NULL;}
-        // insertion pseudocode
-        // 1. do a normal binary search tree insertion
-        // 2. make the inserted node red
-        // 3. fix the red-black properties
-
-        // step 1.
+        RedBlackTree() {    
+          iRoot = new Node;
+          iRoot->colour = false;
+          iRoot->left = nullptr;
+          iRoot->right = nullptr;
+          root = iRoot;
+          }
         void rotateLeft(Node_);
         void rotateRight(Node_);
         void Insert(int);
@@ -52,14 +54,12 @@ class RedBlackTree{
         void deleteExecute(int);
         void printTree();
 };
-// modified to RBTree insert. 
-// need to make the new node red, not done yet
 
 
 void RedBlackTree::rotateLeft(Node_ n){
     Node_ y = n->right;
     n->right = y->left;
-    if (y->left != NULL){
+    if (y->left != iRoot){
         y->left->parent = n;
     }
     y->parent = n->parent;
@@ -80,7 +80,7 @@ void RedBlackTree::rotateLeft(Node_ n){
 void RedBlackTree::rotateRight(Node_ n){
     Node_ y = n->left;
     n->left = y->right;
-    if (y->right != NULL) {
+    if (y->right != iRoot) {
       y->right->parent = n;
     }
     y->parent = n->parent;
@@ -152,11 +152,13 @@ void RedBlackTree::Insert(int input){
     Node_ N = new Node;
     N->data = input;
     N->colour = true;
+    N->left = iRoot;
+    N->right = iRoot;
 
     Node_ z = NULL;
     Node_ r = root;
 
-    while (r != NULL) {
+    while (r != iRoot) {
       z = r;
       if (N->data > r->data) {
         r = r->right;
@@ -322,7 +324,7 @@ void RedBlackTree::Insert(int input){
 
   void RedBlackTree::printHelper(Node_ root, std::string indent, bool last) {
 
-    if (root != NULL) {
+    if (root != iRoot) {
       std::cout << indent;
       if (last) {
         std::cout << "R----";
@@ -344,18 +346,22 @@ void RedBlackTree::Insert(int input){
   void RedBlackTree::printTree() {
 
     if (root) {
-      printHelper(this->root, "", true);
+      printHelper(root, "", true);
     }
   }
 
 int main() {
   RedBlackTree bst;
-  bst.Insert(5);
+  bst.Insert(50);
   bst.Insert(10);
   bst.Insert(2);
+  bst.Insert(12);
 
-  // it will print 3 as long as the third input is smaller than the first 2 while the first input is smaller than the second ex insert(5), insert(10), insert(2)  
-  // it will print 3 as long as the third input is bigger than the first 2 while the first input is bigger than the second ex insert(7), insert(1), insert(80)
+  bst.printTree();
+
+  bst.deleteExecute(12);
+  std::cout<<"after delete"<<std::endl;
+
   bst.printTree();
 
 
