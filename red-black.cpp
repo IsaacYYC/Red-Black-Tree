@@ -35,7 +35,8 @@ class RedBlackTree{
         void printHelper(Node_, std::string, bool);
         void insertFix(Node_);
         void deleteFix(Node_);
-        void Delete(Node_, int);
+
+
 
     public:
         RedBlackTree() {    
@@ -48,15 +49,15 @@ class RedBlackTree{
         void rotateLeft(Node_);
         void rotateRight(Node_);
         void Insert(int);
-        Node_ minimum(Node_);
-        void rbTransplant(Node_, Node_);
-
-        void deleteExecute(int);
+        void Delete(Node_, int);
         void printTree();
-};
+        void deleteExecute(int);
+         void search(int);
+        };
 
 
 void RedBlackTree::rotateLeft(Node_ n){
+  
     Node_ y = n->right;
     n->right = y->left;
 
@@ -227,6 +228,7 @@ void RedBlackTree::Insert(int input)
 
   void RedBlackTree::deleteFix(Node_ x) {
     Node_ s;
+                    
     while (x != root && x->colour == false) {
       if (x == x->parent->left) {
         s = x->parent->right;
@@ -283,79 +285,98 @@ void RedBlackTree::Insert(int input)
       }
     }
     x->colour = false;
+    root->colour = false;
   }
 
-  Node_ RedBlackTree::minimum(Node_ n) {
-    while (n->left != NULL) {
-      n = n->left;
-    }
-    return n;
-  }
-
-  void RedBlackTree::rbTransplant(Node_ u, Node_ v) {
-    if (u->parent == NULL) {
-      root = v;
-    } else if (u == u->parent->left) {
-      u->parent->left = v;
-    } else {
-      u->parent->right = v;
-    }
-    v->parent = u->parent;
-  }
-
-  void RedBlackTree::Delete(Node_ n, int data){
-    Node_ z = NULL;
+  void RedBlackTree::Delete(Node_ node, int key) {
+    Node_ z = iRoot;
     Node_ x, y;
-    while (n != NULL) {
-      if (n->data == data) {
-        z = n;
+    while (node != iRoot) {
+      if (node->data == key) {
+        z = node;
       }
 
-      if (n->data <= data) {
-        n = n->right;
+      if (node->data <= key) {
+        node = node->right;
       } else {
-        n = n->left;
+        node = node->left;
       }
     }
 
-    if (z == NULL) {
+    if (z == iRoot) {
       std::cout << "Key not found in the tree" << std::endl;
       return;
     }
 
     y = z;
     int y_orig_colour = y->colour;
-    if (z->left == NULL) {
+    if (z->left == iRoot) 
+    {
       x = z->right;
-      rbTransplant(z, z->right);
-    } else if (z->right == NULL) {
+      if (z->parent == nullptr) {
+        root = z->right;
+      } else if (z == z->parent->left) {
+        z->parent->left = z->right;
+      } else {
+        z->parent->right = z->right;
+      }
+      z->right->parent = z->parent;
+    } 
+
+  else if (z->right == iRoot) {
       x = z->left;
-      rbTransplant(z, z->left);
+      if (z->parent == nullptr) {
+        root = z->right;
+      } else if (z == z->parent->left) {
+        z->parent->left = z->right;
+      } else {
+        z->parent->right = z->right;
+      }
+      z->right->parent = z->parent;
+  
     } else {
-      y = minimum(z->right);
+      Node_ y;
+      while (z->right->left != iRoot) {
+        z->right = z->right->left;
+      }
+      y = z->right;
+  
       y_orig_colour = y->colour;
       x = y->right;
       if (y->parent == z) {
         x->parent = y;
       } else {
-        rbTransplant(y, y->right);
+        if (y->parent == nullptr) {
+          root = y->right;
+        } else if (y == y->parent->left) {
+          y->parent->left = y->right;
+        } else {
+          y->parent->right = y->right;
+        }
+        y->right->parent = y->parent;
+  
         y->right = z->right;
         y->right->parent = y;
       }
 
-      rbTransplant(z, y);
+ 
+      if (z->parent == nullptr) {
+        root = y;
+      } else if (z == z->parent->left) {
+        z->parent->left = y;
+      } else {
+        z->parent->right = y;
+      }
+      y->parent = z->parent;
+  
       y->left = z->left;
       y->left->parent = y;
       y->colour = z->colour;
     }
     delete z;
-    if (y_orig_colour == false) {
+    if (y_orig_colour == 0) {
       deleteFix(x);
     }
-  }
-
-  void RedBlackTree::deleteExecute(int data) {
-    Delete(root, data);
   }
 
   void RedBlackTree::printHelper(Node_ root, std::string indent, bool last) {
@@ -386,19 +407,77 @@ void RedBlackTree::Insert(int input)
     }
   }
 
+    void RedBlackTree::deleteExecute(int data) {
+    Delete(root, data);
+  }
+
+  void RedBlackTree::search(int x)
+{
+     if(root==NULL)
+     {
+           std::cout<<"\nEmpty Tree\n" ;
+           return  ;
+     }
+
+     std::cout<<"\n Enter key of the node to be searched: ";
+
+     Node_ p=root;
+     int found=0;
+     while(p!=NULL&& found==0)
+     {
+            if(p->data==x)
+                found=1;
+            if(found==0)
+            {
+                 if(p->data<x)
+                      p=p->right;
+                 else
+                      p=p->left;
+            }
+     }
+     if(found==0)
+          std::cout<<"\nElement Not Found.";
+     else
+     {
+                std::cout<<"\n\t FOUND NODE: ";
+                std::cout<<"\n Key: "<<p->data;
+                std::cout<<"\n Colour: ";
+    if(p->colour==false)
+     std::cout<<"Black";
+    else
+     std::cout<<"Red";
+                if(p->parent!=NULL)
+                       std::cout<<"\n Parent: "<<p->parent->data;
+                else
+                       std::cout<<"\n There is no parent of the node.  ";
+                if(p->right!=NULL)
+                       std::cout<<"\n Right Child: "<<p->right->data;
+                else
+                       std::cout<<"\n There is no right child of the node.  ";
+                if(p->left!=NULL)
+                       std::cout<<"\n Left Child: "<<p->left->data;
+                else
+                       std::cout<<"\n There is no left child of the node.  ";
+                std::cout<<std::endl;
+
+     }
+}
+
 int main() {
   RedBlackTree bst;
   bst.Insert(50);
   bst.Insert(10);
   bst.Insert(2);
   bst.Insert(12);
+  bst.search(2);
 
   bst.printTree();
 
-  bst.deleteExecute(12);
-  std::cout<<"after delete"<<std::endl;
+  // std::cout<<"after delete"<< std::endl;
+  // bst.deleteExecute(2);
 
-  bst.printTree();
+
+  // bst.printTree();
 
 
 
