@@ -1,14 +1,5 @@
 #include <iostream>
 
-// a red black tree is a binary search tree in which each node is either red, or black
-
-// properties 
-// 1. every node is red or black
-// 2. the root of the tree is black
-// 3. if a node is red, both children must be black
-// 4. Every simple path from a node to a descendant leaf contains the same number of black nodes. 
-// 5. Every leaf (NULL) is black. 
-
 struct Node {
   int data;
   Node *parent;
@@ -32,9 +23,12 @@ class RedBlackTree{
     private:
         Node_ root;
         Node_ iRoot;
-        void printHelper(Node_, std::string, bool);
+        void printFormating(Node_, std::string, bool);
         void insertFix(Node_);
         void deleteFix(Node_);
+        void rotateLeft(Node_);
+        void rotateRight(Node_);
+        void Delete(Node_, int);
 
 
 
@@ -46,17 +40,17 @@ class RedBlackTree{
           iRoot->right = nullptr;
           root = iRoot;
           }
-        void rotateLeft(Node_);
-        void rotateRight(Node_);
+
+
         void Insert(int);
-        void Delete(Node_, int);
         void printTree();
         void deleteExecute(int);
-         void search(int);
+        void search(int);
         };
 
 
-void RedBlackTree::rotateLeft(Node_ n){
+void RedBlackTree::rotateLeft(Node_ n)
+{
   
     Node_ y = n->right;
     n->right = y->left;
@@ -68,12 +62,12 @@ void RedBlackTree::rotateLeft(Node_ n){
     y->parent = n->parent;
 
     if (n->parent == NULL)
-    { //n is the root
+    { 
         root = y;
     }
 
     else if (n == n->parent->left)
-    { // n is the left child
+    { 
         n->parent->left = y;
     }
 
@@ -86,7 +80,8 @@ void RedBlackTree::rotateLeft(Node_ n){
     n->parent = y;
 }
 
-void RedBlackTree::rotateRight(Node_ n){
+void RedBlackTree::rotateRight(Node_ n)
+{
     Node_ y = n->left;
     n->left = y->right;
 
@@ -226,24 +221,31 @@ void RedBlackTree::Insert(int input)
     insertFix(N);
   }
 
-  void RedBlackTree::deleteFix(Node_ x) {
+  void RedBlackTree::deleteFix(Node_ x) 
+  {
     Node_ s;
                     
-    while (x != root && x->colour == false) {
-      if (x == x->parent->left) {
+    while (x != root && x->colour == false) 
+    {
+      if (x == x->parent->left) 
+      {
         s = x->parent->right;
-        if (s->colour == true) {
+        if (s->colour == true) 
+        {
           s->colour = false;
           x->parent->colour = true;
           rotateLeft(x->parent);
           s = x->parent->right;
         }
 
-        if (s->left->colour == false && s->right->colour == false) {
+        if (s->left->colour == false && s->right->colour == false) 
+        {
           s->colour = true;
           x = x->parent;
-        } else {
-          if (s->right->colour == false) {
+        } else 
+        {
+          if (s->right->colour == false) 
+          {
             s->left->colour = false;
             s->colour = true;
             rotateRight(s);
@@ -256,20 +258,27 @@ void RedBlackTree::Insert(int input)
           rotateLeft(x->parent);
           x = root;
         }
-      } else {
+      } 
+      else 
+      {
         s = x->parent->left;
-        if (s->colour == true) {
+        if (s->colour == true) 
+        {
           s->colour = false;
           x->parent->colour = true;
           rotateRight(x->parent);
           s = x->parent->left;
         }
 
-        if (s->right->colour == false && s->right->colour == false) {
+        if (s->right->colour == false && s->right->colour == false) 
+        {
           s->colour = true;
           x = x->parent;
-        } else {
-          if (s->left->colour == false) {
+        } 
+        else 
+        {
+          if (s->left->colour == false) 
+          {
             s->right->colour = false;
             s->colour = true;
             rotateLeft(s);
@@ -288,24 +297,24 @@ void RedBlackTree::Insert(int input)
     root->colour = false;
   }
 
-  void RedBlackTree::Delete(Node_ node, int key) {
+  void RedBlackTree::Delete(Node_ node, int key) 
+  {
     Node_ z = iRoot;
     Node_ x, y;
-    while (node != iRoot) {
-      if (node->data == key) {
+    while (node != iRoot) 
+    {
+      if (node->data == key) 
+      {
         z = node;
       }
 
-      if (node->data <= key) {
+      if (node->data <= key) 
+      {
         node = node->right;
-      } else {
+      } else 
+      {
         node = node->left;
       }
-    }
-
-    if (z == iRoot) {
-      std::cout << "Key not found in the tree" << std::endl;
-      return;
     }
 
     y = z;
@@ -313,44 +322,61 @@ void RedBlackTree::Insert(int input)
     if (z->left == iRoot) 
     {
       x = z->right;
-      if (z->parent == nullptr) {
+      if (z->parent == NULL) 
+      {
         root = z->right;
-      } else if (z == z->parent->left) {
+      } else if (z == z->parent->left) 
+      {
         z->parent->left = z->right;
-      } else {
+      } else 
+      {
         z->parent->right = z->right;
       }
       z->right->parent = z->parent;
     } 
 
-  else if (z->right == iRoot) {
+  else if (z->right == iRoot) 
+  {
       x = z->left;
-      if (z->parent == nullptr) {
+      if (z->parent == NULL) 
+      {
         root = z->right;
-      } else if (z == z->parent->left) {
+      } else if (z == z->parent->left) 
+      {
         z->parent->left = z->right;
-      } else {
+      } else 
+      {
         z->parent->right = z->right;
       }
       z->right->parent = z->parent;
   
-    } else {
+    } 
+
+    else 
+    {
       Node_ y;
-      while (z->right->left != iRoot) {
+      while (z->right->left != iRoot) 
+      {
         z->right = z->right->left;
       }
       y = z->right;
   
       y_orig_colour = y->colour;
       x = y->right;
-      if (y->parent == z) {
+      if (y->parent == z) 
+      {
         x->parent = y;
       } else {
-        if (y->parent == nullptr) {
+        if (y->parent == NULL) 
+        {
           root = y->right;
-        } else if (y == y->parent->left) {
+        } 
+        else if (y == y->parent->left) 
+        {
           y->parent->left = y->right;
-        } else {
+        } 
+        else 
+        {
           y->parent->right = y->right;
         }
         y->right->parent = y->parent;
@@ -360,11 +386,16 @@ void RedBlackTree::Insert(int input)
       }
 
  
-      if (z->parent == nullptr) {
+      if (z->parent == NULL) 
+      {
         root = y;
-      } else if (z == z->parent->left) {
+      } 
+      else if (z == z->parent->left) 
+      {
         z->parent->left = y;
-      } else {
+      } 
+      else 
+      {
         z->parent->right = y;
       }
       y->parent = z->parent;
@@ -379,48 +410,39 @@ void RedBlackTree::Insert(int input)
     }
   }
 
-  void RedBlackTree::printHelper(Node_ root, std::string indent, bool last) {
+  void RedBlackTree::printFormating(Node_ root, std::string spacing, bool end) 
+  {
 
     if (root != iRoot) {
-      std::cout << indent;
-      if (last) {
+      std::cout << spacing;
+      if (end) {
         std::cout << "R----";
-        indent += "   ";
+        spacing += "   ";
       } else {
         std::cout << "L----";
-        indent += "|  ";
+        spacing += "|  ";
       }
 
       bool sColor = root->colour ? true : false;
       std::string sColour = (sColor == true) ? "RED" : "BLACK";
       std::cout << root->data << "(" << sColour << ")" << std::endl;
-      printHelper(root->left, indent, false);
-      printHelper(root->right, indent, true);
-    }
-
-  }
-
-  void RedBlackTree::printTree() {
-
-    if (root) {
-      printHelper(root, "", true);
+      printFormating(root->left, spacing, false);
+      printFormating(root->right, spacing, true);
     }
   }
 
-    void RedBlackTree::deleteExecute(int data) {
+  void RedBlackTree::printTree() 
+  {
+    printFormating(root, "", true);
+  }
+
+  void RedBlackTree::deleteExecute(int data) 
+  {
     Delete(root, data);
   }
 
   void RedBlackTree::search(int x)
-{
-     if(root==NULL)
-     {
-           std::cout<<"\nEmpty Tree\n" ;
-           return  ;
-     }
-
-     std::cout<<"\n Enter key of the node to be searched: ";
-
+  {
      Node_ p=root;
      int found=0;
      while(p!=NULL&& found==0)
@@ -435,32 +457,19 @@ void RedBlackTree::Insert(int input)
                       p=p->left;
             }
      }
-     if(found==0)
-          std::cout<<"\nElement Not Found.";
-     else
-     {
-                std::cout<<"\n\t FOUND NODE: ";
-                std::cout<<"\n Key: "<<p->data;
-                std::cout<<"\n Colour: ";
-    if(p->colour==false)
-     std::cout<<"Black";
-    else
-     std::cout<<"Red";
-                if(p->parent!=NULL)
-                       std::cout<<"\n Parent: "<<p->parent->data;
-                else
-                       std::cout<<"\n There is no parent of the node.  ";
-                if(p->right!=NULL)
-                       std::cout<<"\n Right Child: "<<p->right->data;
-                else
-                       std::cout<<"\n There is no right child of the node.  ";
-                if(p->left!=NULL)
-                       std::cout<<"\n Left Child: "<<p->left->data;
-                else
-                       std::cout<<"\n There is no left child of the node.  ";
-                std::cout<<std::endl;
-
-     }
+      std::cout<<std::endl<<"FOUND NODE: ";
+      std::cout<<std::endl<<" Key: "<<p->data;
+      std::cout<<std::endl<<" Colour: ";
+      if(p->colour==false)
+      {
+        std::cout<<"Black";
+        std::cout<<std::endl<<std::endl;
+      }
+      else
+      {
+        std::cout<<"Red";
+        std::cout<<std::endl<<std::endl;
+      }    
 }
 
 int main() {
@@ -469,22 +478,16 @@ int main() {
   bst.Insert(10);
   bst.Insert(2);
   bst.Insert(12);
+  bst.Insert(90);
+  bst.Insert(56);
+
   bst.search(2);
 
   bst.printTree();
+  std::cout << std::endl;
 
-  // std::cout<<"after delete"<< std::endl;
-  // bst.deleteExecute(2);
+  std::cout<<"after delete"<< std::endl<< std::endl;
+  bst.deleteExecute(2);
 
-
-  // bst.printTree();
-
-
-
-
-
+  bst.printTree();
 }
-
-
-
-
